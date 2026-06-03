@@ -3,6 +3,7 @@ package com.LusoSAC.Sistema_Ecommerce.controller;
 import com.LusoSAC.Sistema_Ecommerce.model.ConsultaProducto;
 import com.LusoSAC.Sistema_Ecommerce.repository.ConsultaProductoRepository;
 import com.LusoSAC.Sistema_Ecommerce.service.ConsultaProductoService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,13 @@ public class ConsultaProductoController {
     }
 
     @PostMapping
-    public ConsultaProducto guardar(@RequestBody ConsultaProducto consulta) {
-        return consultaProductoService.registrar(consulta);
+    public ResponseEntity<ConsultaProducto> guardar(@RequestBody ConsultaProducto consulta) {
+        ConsultaProducto guardada = consultaProductoService.registrar(consulta);
+
+        if (guardada == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(guardada);
     }
 }

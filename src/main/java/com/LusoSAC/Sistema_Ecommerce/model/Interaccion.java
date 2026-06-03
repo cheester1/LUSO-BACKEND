@@ -34,6 +34,12 @@ public class Interaccion {
     @Column(name = "tipo_interaccion")
     private String tipo;
 
+    @Column(name = "rol_origen")
+    private String rolOrigen;
+
+    @Column(name = "origen_pagina")
+    private String origenPagina;
+
     @Column(name = "detalle")
     private String detalle;
 
@@ -70,6 +76,12 @@ public class Interaccion {
 
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
+
+    public String getRolOrigen() { return rolOrigen; }
+    public void setRolOrigen(String rolOrigen) { this.rolOrigen = rolOrigen; }
+
+    public String getOrigenPagina() { return origenPagina; }
+    public void setOrigenPagina(String origenPagina) { this.origenPagina = origenPagina; }
 
     public String getDetalle() { return detalle; }
     public void setDetalle(String detalle) { this.detalle = detalle; }

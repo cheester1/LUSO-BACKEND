@@ -12,6 +12,8 @@ public class InteraccionRequest {
     private String ipAddress;
     private String userAgent;
     private String rol;
+    private String rolOrigen;
+    private String origenPagina;
 
     public Long getIdProducto() {
         return idProducto;
@@ -91,5 +93,21 @@ public class InteraccionRequest {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public String getRolOrigen() {
+        return rolOrigen;
+    }
+
+    public void setRolOrigen(String rolOrigen) {
+        this.rolOrigen = rolOrigen;
+    }
+
+    public String getOrigenPagina() {
+        return origenPagina;
+    }
+
+    public void setOrigenPagina(String origenPagina) {
+        this.origenPagina = origenPagina;
     }
 }

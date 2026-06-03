@@ -4,6 +4,7 @@ import com.LusoSAC.Sistema_Ecommerce.dto.dashboard.ProductoRankingResponse;
 import com.LusoSAC.Sistema_Ecommerce.model.Favorito;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,4 +33,20 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
         ORDER BY COUNT(f) DESC
     """)
     List<ProductoRankingResponse> productosMasFavoritos(Pageable pageable);
+
+    @Query("""
+        SELECT new com.LusoSAC.Sistema_Ecommerce.dto.dashboard.ProductoRankingResponse(
+            p.id,
+            p.nombre,
+            p.modelo,
+            p.precio,
+            COUNT(f)
+        )
+        FROM Favorito f
+        JOIN Producto p ON p.id = f.idProducto
+        WHERE f.idUsuario = :idUsuario
+        GROUP BY p.id, p.nombre, p.modelo, p.precio
+        ORDER BY COUNT(f) DESC, MAX(f.fechaCreacion) DESC
+    """)
+    List<ProductoRankingResponse> productosMasFavoritosPorUsuario(@Param("idUsuario") Long idUsuario, Pageable pageable);
 }

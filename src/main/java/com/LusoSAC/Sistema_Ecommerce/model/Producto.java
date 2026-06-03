@@ -58,12 +58,6 @@ public class Producto {
     @Column(name = "peso_producto")
     private BigDecimal peso;
 
-    @Column(name = "categoria_prod")
-    private String categoriaProd;
-
-    @Column(name = "nombre_prod")
-    private String nombreProd;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_categoria", referencedColumnName = "id_categoria", insertable = false, updatable = false)
     private Categoria categoria;
@@ -120,12 +114,6 @@ public class Producto {
     public BigDecimal getPeso() { return peso; }
     public void setPeso(BigDecimal peso) { this.peso = peso; }
 
-    public String getCategoriaProd() { return categoriaProd; }
-    public void setCategoriaProd(String categoriaProd) { this.categoriaProd = categoriaProd; }
-
-    public String getNombreProd() { return nombreProd; }
-    public void setNombreProd(String nombreProd) { this.nombreProd = nombreProd; }
-
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 
@@ -133,7 +121,7 @@ public class Producto {
     public void setMarca(Marca marca) { this.marca = marca; }
 
     public String getNombreCategoria() {
-        return categoria != null ? categoria.getNombre() : categoriaProd;
+        return categoria != null ? categoria.getNombre() : null;
     }
 
     public String getNombreMarca() {

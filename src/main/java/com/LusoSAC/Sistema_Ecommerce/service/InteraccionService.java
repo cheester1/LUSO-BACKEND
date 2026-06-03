@@ -37,15 +37,14 @@ public class InteraccionService {
     }
 
     public Interaccion registrar(InteraccionRequest request) {
+        if (request == null || request.getTipo() == null || request.getTipo().isBlank()) {
+            return null;
+        }
 
-        Usuario usuario = null;
+        Usuario usuario = obtenerUsuario(request.getIdUsuario());
 
-        if (request.getIdUsuario() != null) {
-            usuario = usuarioRepository.findById(request.getIdUsuario()).orElse(null);
-
-            if (usuario != null && esAdmin(usuario)) {
-                return null;
-            }
+        if (usuario != null && esAdmin(usuario)) {
+            return null;
         }
 
         Interaccion interaccion = new Interaccion();
@@ -62,15 +61,26 @@ public class InteraccionService {
 
         if (usuario != null) {
             interaccion.setUsuario(usuario);
+            interaccion.setRolOrigen("USUARIO");
+            interaccion.setSessionId(null);
+            interaccion.setVisitante(null);
+        } else {
+            Visitante visitante = obtenerOCrearVisitante(request);
+
+            if (visitante != null) {
+                interaccion.setVisitante(visitante);
+                interaccion.setSessionId(visitante.getSessionId());
+            } else {
+                interaccion.setSessionId(limpiar(request.getSessionId()));
+            }
+
+            interaccion.setRolOrigen("VISITANTE");
         }
 
-        Visitante visitante = obtenerOCrearVisitante(request);
-        if (visitante != null) {
-            interaccion.setVisitante(visitante);
-        }
+        String tipoNormalizado = normalizar(request.getTipo());
 
-        interaccion.setSessionId(request.getSessionId());
-        interaccion.setTipo(normalizar(request.getTipo()));
+        interaccion.setTipo(tipoNormalizado);
+        interaccion.setOrigenPagina(normalizarOrigenPagina(request.getOrigenPagina()));
         interaccion.setDetalle(request.getDetalle());
         interaccion.setIpAddress(request.getIpAddress());
         interaccion.setUserAgent(request.getUserAgent());
@@ -78,10 +88,7 @@ public class InteraccionService {
         Interaccion guardada = interaccionRepository.save(interaccion);
 
         if (request.getIdProducto() != null) {
-            productoMetricaService.registrarInteraccionProducto(
-                    request.getIdProducto(),
-                    request.getTipo()
-            );
+            productoMetricaService.registrarInteraccionProducto(request.getIdProducto(), tipoNormalizado);
         }
 
         return guardada;
@@ -95,21 +102,28 @@ public class InteraccionService {
         }
     }
 
-    private Visitante obtenerOCrearVisitante(InteraccionRequest request) {
-        if (request.getIdVisitante() != null) {
-            return visitanteRepository.findById(request.getIdVisitante()).orElse(null);
-        }
-
-        if (request.getSessionId() == null || request.getSessionId().trim().isEmpty()) {
+    private Usuario obtenerUsuario(Long idUsuario) {
+        if (idUsuario == null || idUsuario <= 0) {
             return null;
         }
 
-        String sessionId = request.getSessionId().trim();
+        return usuarioRepository.findById(idUsuario).orElse(null);
+    }
+
+    private Visitante obtenerOCrearVisitante(InteraccionRequest request) {
+        if (request.getIdVisitante() != null && request.getIdVisitante() > 0) {
+            return visitanteRepository.findById(request.getIdVisitante()).orElse(null);
+        }
+
+        String sessionId = limpiar(request.getSessionId());
+
+        if (sessionId == null) {
+            return null;
+        }
 
         return visitanteRepository.findBySessionId(sessionId)
                 .map(visitante -> {
                     visitante.setFechaUltimaVisita(LocalDateTime.now());
-                    visitante.setTotalVisitas(valorSeguro(visitante.getTotalVisitas()) + 1);
                     return visitanteRepository.save(visitante);
                 })
                 .orElseGet(() -> {
@@ -119,7 +133,6 @@ public class InteraccionService {
                     nuevo.setUserAgent(request.getUserAgent());
                     nuevo.setFechaPrimeraVisita(LocalDateTime.now());
                     nuevo.setFechaUltimaVisita(LocalDateTime.now());
-                    nuevo.setTotalVisitas(1);
                     return visitanteRepository.save(nuevo);
                 });
     }
@@ -129,14 +142,26 @@ public class InteraccionService {
 
         String rol = usuario.getRol().trim().toUpperCase();
 
-        return rol.equals("ADMIN") || rol.equals("ADMINISTRADOR");
+        return rol.equals("ADMIN") || rol.equals("ADMINISTRADOR") || rol.equals("ROLE_ADMINISTRADOR");
     }
 
     private String normalizar(String tipo) {
         return tipo == null ? null : tipo.trim().toLowerCase();
     }
 
-    private Integer valorSeguro(Integer valor) {
-        return valor == null ? 0 : valor;
+    private String normalizarOrigenPagina(String origenPagina) {
+        if (origenPagina == null || origenPagina.isBlank()) {
+            return null;
+        }
+
+        return origenPagina.trim().toUpperCase();
+    }
+
+    private String limpiar(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return null;
+        }
+
+        return texto.trim();
     }
 }

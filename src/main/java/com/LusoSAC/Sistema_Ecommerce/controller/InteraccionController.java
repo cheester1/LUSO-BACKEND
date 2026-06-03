@@ -37,6 +37,10 @@ public class InteraccionController {
 
         Interaccion guardada = interaccionService.registrar(request);
 
+        if (guardada == null) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(guardada);
     }
 

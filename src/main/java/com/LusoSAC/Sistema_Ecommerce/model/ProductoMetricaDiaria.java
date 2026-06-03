@@ -2,15 +2,22 @@ package com.LusoSAC.Sistema_Ecommerce.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "producto_metricas")
-public class ProductoMetrica {
+@Table(name = "producto_metricas_diarias")
+public class ProductoMetricaDiaria {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_metrica")
+    private Long id;
+
     @Column(name = "id_producto")
     private Long idProducto;
+
+    @Column(name = "fecha")
+    private LocalDate fecha;
 
     @Column(name = "total_vistas")
     private Integer totalVistas;
@@ -33,11 +40,14 @@ public class ProductoMetrica {
     @Column(name = "score_producto")
     private BigDecimal scoreProducto;
 
-    @Column(name = "fecha_actualizacion", insertable = false, updatable = false)
-    private Timestamp fechaActualizacion;
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public Long getIdProducto() { return idProducto; }
     public void setIdProducto(Long idProducto) { this.idProducto = idProducto; }
+
+    public LocalDate getFecha() { return fecha; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
 
     public Integer getTotalVistas() { return totalVistas; }
     public void setTotalVistas(Integer totalVistas) { this.totalVistas = totalVistas; }
@@ -59,7 +69,4 @@ public class ProductoMetrica {
 
     public BigDecimal getScoreProducto() { return scoreProducto; }
     public void setScoreProducto(BigDecimal scoreProducto) { this.scoreProducto = scoreProducto; }
-
-    public Timestamp getFechaActualizacion() { return fechaActualizacion; }
-    public void setFechaActualizacion(Timestamp fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
 }

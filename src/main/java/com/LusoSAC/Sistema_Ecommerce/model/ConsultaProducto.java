@@ -18,6 +18,12 @@ public class ConsultaProducto {
     @Column(name = "id_visitante")
     private Long idVisitante;
 
+    @Column(name = "id_usuario")
+    private Long idUsuario;
+
+    @Column(name = "session_id")
+    private String sessionId;
+
     @Column(name = "nombre_cliente")
     private String nombreCliente;
 
@@ -29,6 +35,9 @@ public class ConsultaProducto {
 
     @Column(name = "tipo_consulta")
     private String tipoConsulta;
+
+    @Column(name = "estado_consulta")
+    private String estadoConsulta;
 
     @Column(name = "fecha_creacion", insertable = false, updatable = false)
     private Timestamp fechaCreacion;
@@ -42,6 +51,12 @@ public class ConsultaProducto {
     public Long getIdVisitante() { return idVisitante; }
     public void setIdVisitante(Long idVisitante) { this.idVisitante = idVisitante; }
 
+    public Long getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
+
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+
     public String getNombreCliente() { return nombreCliente; }
     public void setNombreCliente(String nombreCliente) { this.nombreCliente = nombreCliente; }
 
@@ -53,6 +68,9 @@ public class ConsultaProducto {
 
     public String getTipoConsulta() { return tipoConsulta; }
     public void setTipoConsulta(String tipoConsulta) { this.tipoConsulta = tipoConsulta; }
+
+    public String getEstadoConsulta() { return estadoConsulta; }
+    public void setEstadoConsulta(String estadoConsulta) { this.estadoConsulta = estadoConsulta; }
 
     public Timestamp getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(Timestamp fechaCreacion) { this.fechaCreacion = fechaCreacion; }

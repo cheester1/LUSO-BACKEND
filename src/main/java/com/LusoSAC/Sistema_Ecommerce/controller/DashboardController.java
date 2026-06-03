@@ -42,6 +42,11 @@ public class DashboardController {
         return dashboardService.obtenerProductosMasFavoritos();
     }
 
+    @GetMapping("/usuarios/{idUsuario}/productos-mas-favoritos")
+    public List<ProductoRankingResponse> productosMasFavoritosPorUsuario(@PathVariable Long idUsuario) {
+        return dashboardService.obtenerProductosMasFavoritosPorUsuario(idUsuario);
+    }
+
     @GetMapping("/productos-mas-vistos")
     public List<ProductoRankingResponse> productosMasVistos() {
         return dashboardService.obtenerProductosMasVistos();
@@ -95,5 +100,30 @@ public class DashboardController {
     @GetMapping("/visitantes-intereses")
     public List<VisitanteInteresResponse> visitantesIntereses() {
         return dashboardService.obtenerVisitantesIntereses();
+    }
+
+    @GetMapping("/top3/clicks")
+    public List<ProductoTopDashboardResponse> top3Clicks() {
+        return dashboardService.obtenerTop3Clicks();
+    }
+
+    @GetMapping("/top3/favoritos")
+    public List<ProductoTopDashboardResponse> top3Favoritos() {
+        return dashboardService.obtenerTop3Favoritos();
+    }
+
+    @GetMapping("/top3/whatsapp")
+    public List<ProductoTopDashboardResponse> top3Whatsapp() {
+        return dashboardService.obtenerTop3Whatsapp();
+    }
+
+    @GetMapping("/top3/vistas")
+    public List<ProductoTopDashboardResponse> top3Vistas() {
+        return dashboardService.obtenerTop3Vistas();
+    }
+
+    @GetMapping("/top3/abandono")
+    public List<ProductoTopDashboardResponse> top3Abandono() {
+        return dashboardService.obtenerTop3Abandono();
     }
 }

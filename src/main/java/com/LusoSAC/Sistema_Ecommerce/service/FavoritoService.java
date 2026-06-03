@@ -11,14 +11,9 @@ import java.util.List;
 public class FavoritoService {
 
     private final FavoritoRepository favoritoRepository;
-    private final ProductoMetricaService productoMetricaService;
 
-    public FavoritoService(
-            FavoritoRepository favoritoRepository,
-            ProductoMetricaService productoMetricaService
-    ) {
+    public FavoritoService(FavoritoRepository favoritoRepository) {
         this.favoritoRepository = favoritoRepository;
-        this.productoMetricaService = productoMetricaService;
     }
 
     public List<Favorito> listarPorUsuario(Long idUsuario) {
@@ -45,10 +40,6 @@ public class FavoritoService {
         favorito.setIdUsuario(idUsuario);
         favorito.setFechaCreacion(LocalDateTime.now());
 
-        Favorito guardado = favoritoRepository.save(favorito);
-
-        productoMetricaService.registrarInteraccionProducto(idProducto, "favorito");
-
-        return guardado;
+        return favoritoRepository.save(favorito);
     }
 }
