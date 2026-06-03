@@ -1,6 +1,15 @@
 package com.LusoSAC.Sistema_Ecommerce.repository;
 
+import com.LusoSAC.Sistema_Ecommerce.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.LusoSAC.Sistema_Ecommerce.model.*;
+import org.springframework.stereotype.Repository;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {}
+import java.util.Optional;
+
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    Optional<Usuario> findByUsuario(String usuario);
+
+    boolean existsByUsuario(String usuario);
+}

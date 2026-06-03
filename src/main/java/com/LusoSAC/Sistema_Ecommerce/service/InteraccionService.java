@@ -1,0 +1,142 @@
+package com.LusoSAC.Sistema_Ecommerce.service;
+
+import com.LusoSAC.Sistema_Ecommerce.dto.dashboard.InteraccionRequest;
+import com.LusoSAC.Sistema_Ecommerce.model.Interaccion;
+import com.LusoSAC.Sistema_Ecommerce.model.Usuario;
+import com.LusoSAC.Sistema_Ecommerce.model.Visitante;
+import com.LusoSAC.Sistema_Ecommerce.repository.*;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class InteraccionService {
+
+    private final InteraccionRepository interaccionRepository;
+    private final ProductoRepository productoRepository;
+    private final ServicioRepository servicioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final VisitanteRepository visitanteRepository;
+    private final ProductoMetricaService productoMetricaService;
+
+    public InteraccionService(
+            InteraccionRepository interaccionRepository,
+            ProductoRepository productoRepository,
+            ServicioRepository servicioRepository,
+            UsuarioRepository usuarioRepository,
+            VisitanteRepository visitanteRepository,
+            ProductoMetricaService productoMetricaService
+    ) {
+        this.interaccionRepository = interaccionRepository;
+        this.productoRepository = productoRepository;
+        this.servicioRepository = servicioRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.visitanteRepository = visitanteRepository;
+        this.productoMetricaService = productoMetricaService;
+    }
+
+    public Interaccion registrar(InteraccionRequest request) {
+
+        Usuario usuario = null;
+
+        if (request.getIdUsuario() != null) {
+            usuario = usuarioRepository.findById(request.getIdUsuario()).orElse(null);
+
+            if (usuario != null && esAdmin(usuario)) {
+                return null;
+            }
+        }
+
+        Interaccion interaccion = new Interaccion();
+
+        if (request.getIdProducto() != null) {
+            productoRepository.findById(request.getIdProducto())
+                    .ifPresent(interaccion::setProducto);
+        }
+
+        if (request.getIdServicio() != null) {
+            servicioRepository.findById(request.getIdServicio())
+                    .ifPresent(interaccion::setServicio);
+        }
+
+        if (usuario != null) {
+            interaccion.setUsuario(usuario);
+        }
+
+        Visitante visitante = obtenerOCrearVisitante(request);
+        if (visitante != null) {
+            interaccion.setVisitante(visitante);
+        }
+
+        interaccion.setSessionId(request.getSessionId());
+        interaccion.setTipo(normalizar(request.getTipo()));
+        interaccion.setDetalle(request.getDetalle());
+        interaccion.setIpAddress(request.getIpAddress());
+        interaccion.setUserAgent(request.getUserAgent());
+
+        Interaccion guardada = interaccionRepository.save(interaccion);
+
+        if (request.getIdProducto() != null) {
+            productoMetricaService.registrarInteraccionProducto(
+                    request.getIdProducto(),
+                    request.getTipo()
+            );
+        }
+
+        return guardada;
+    }
+
+    public List<Interaccion> listarUltimas() {
+        try {
+            return interaccionRepository.findTop20ByOrderByIdDesc();
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    private Visitante obtenerOCrearVisitante(InteraccionRequest request) {
+        if (request.getIdVisitante() != null) {
+            return visitanteRepository.findById(request.getIdVisitante()).orElse(null);
+        }
+
+        if (request.getSessionId() == null || request.getSessionId().trim().isEmpty()) {
+            return null;
+        }
+
+        String sessionId = request.getSessionId().trim();
+
+        return visitanteRepository.findBySessionId(sessionId)
+                .map(visitante -> {
+                    visitante.setFechaUltimaVisita(LocalDateTime.now());
+                    visitante.setTotalVisitas(valorSeguro(visitante.getTotalVisitas()) + 1);
+                    return visitanteRepository.save(visitante);
+                })
+                .orElseGet(() -> {
+                    Visitante nuevo = new Visitante();
+                    nuevo.setSessionId(sessionId);
+                    nuevo.setIpAddress(request.getIpAddress());
+                    nuevo.setUserAgent(request.getUserAgent());
+                    nuevo.setFechaPrimeraVisita(LocalDateTime.now());
+                    nuevo.setFechaUltimaVisita(LocalDateTime.now());
+                    nuevo.setTotalVisitas(1);
+                    return visitanteRepository.save(nuevo);
+                });
+    }
+
+    private boolean esAdmin(Usuario usuario) {
+        if (usuario.getRol() == null) return false;
+
+        String rol = usuario.getRol().trim().toUpperCase();
+
+        return rol.equals("ADMIN") || rol.equals("ADMINISTRADOR");
+    }
+
+    private String normalizar(String tipo) {
+        return tipo == null ? null : tipo.trim().toLowerCase();
+    }
+
+    private Integer valorSeguro(Integer valor) {
+        return valor == null ? 0 : valor;
+    }
+}

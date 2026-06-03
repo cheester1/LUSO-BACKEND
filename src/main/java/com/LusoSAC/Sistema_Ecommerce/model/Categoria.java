@@ -4,28 +4,22 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usuarios")
-public class Usuario {
+@Table(name = "categorias")
+public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
+    @Column(name = "id_categoria")
     private Long id;
 
-    @Column(name = "nombre_usuario")
+    @Column(name = "nombre_categoria")
     private String nombre;
-
-    @Column(name = "usuario")
-    private String usuario;
-
-    @Column(name = "password_hash")
-    private String passwordHash;
-
-    @Column(name = "rol")
-    private String rol;
 
     @Column(name = "estado")
     private Integer estado;
+
+    @Column(name = "descripcion_categoria")
+    private String descripcion;
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
@@ -46,36 +40,20 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-
     public Integer getEstado() {
         return estado;
     }
 
     public void setEstado(Integer estado) {
         this.estado = estado;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public LocalDateTime getFechaCreacion() {
